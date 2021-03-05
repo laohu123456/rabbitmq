@@ -1,0 +1,19 @@
+server:
+  port: 8088
+  tomcat:
+    threads:
+      max: 1000
+    max-connections: 20000
+
+spring:
+  rabbitmq:
+    addresses: 192.168.56.101:5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 10000
+    listener:
+      simple:
+        acknowledge-mode: manual
+        concurrency: 5
+        max-concurrency: 10

@@ -1,0 +1,19 @@
+server:
+  port: 8091
+  tomcat:
+    threads:
+      max: 1000
+    max-connections: 20000
+
+#rabbitmq 配置
+spring:
+  rabbitmq:
+    addresses: 192.168.56.101:5672
+    username: guest
+    password: guest
+    virtual-host: /
+    connection-timeout: 10000
+    publisher-returns: true
+    template:
+      mandatory: true
+    publisher-confirm-type: correlated

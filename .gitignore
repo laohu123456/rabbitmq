@@ -2,3 +2,5 @@
 /common/target/
 /consumer/target/
 /provider/target/
+.idea
+.gitignore

@@ -1,5 +1,7 @@
 package com.provider.sender;
 
+import com.server.pojo.MainInfo;
+import com.server.utils.GetUuid;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.Message;
 import org.springframework.amqp.core.MessageBuilder;
@@ -53,9 +55,22 @@ public class SendMessage {
         });*/
         rabbitTemplate.setReturnCallback(returnCallback);
         CorrelationData correlationData = new CorrelationData("123");
-        Message message = MessageBuilder.withBody(msg.getBytes(StandardCharsets.UTF_8)).build();
-        rabbitTemplate.convertAndSend("exchange-1","springboot.test", message,correlationData);
+        Message message = MessageBuilder
+                .withBody(msg.getBytes(StandardCharsets.UTF_8))
+                .build();
+        rabbitTemplate.convertAndSend("exchange-1","springboot.test", message, correlationData);
     }
 
 
+    public String receiveMessage(String mainInfo) {
+        rabbitTemplate.setConfirmCallback(confirmCallback);
+        rabbitTemplate.setReturnCallback(returnCallback);
+        String yzm = GetUuid.getUuid();
+        CorrelationData correlationData = new CorrelationData(yzm);
+        Message message = MessageBuilder
+                .withBody(mainInfo.getBytes(StandardCharsets.UTF_8))
+                .build();
+        rabbitTemplate.convertAndSend("exchange-1","email.yzm", message, correlationData);
+        return yzm;
+    }
 }

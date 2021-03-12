@@ -2,6 +2,8 @@ package com.consumer.utils;
 
 
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.server.pojo.MainInfo;
 
 import javax.mail.*;
@@ -54,7 +56,7 @@ public class SendAliEmail {
         return mimeMessage;
     }
 
-    public static void main(String[] args) throws UnsupportedEncodingException, MessagingException {
+    public static void main(String[] args) throws UnsupportedEncodingException, MessagingException, JsonProcessingException {
         MainInfo mainInfo = new MainInfo();
         mainInfo.setSendEmailAccount("h@hyq.a");
         mainInfo.setSendEmailPassword("h");
@@ -63,7 +65,10 @@ public class SendAliEmail {
         mainInfo.setReceivePersonName("Y");
         mainInfo.setMailTitle("firestEmail");
         mainInfo.setMailContent("这是第一封Java发送的邮件");
-        sendMail(mainInfo);
+        //sendMail(mainInfo);
+        ObjectMapper objectMapper = new ObjectMapper();
+        String s = objectMapper.writeValueAsString(mainInfo);
+        System.out.println(s);
     }
 
 }

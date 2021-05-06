@@ -73,4 +73,19 @@ public class SendMessage {
         rabbitTemplate.convertAndSend("exchange-1","email.yzm", message, correlationData);
         return yzm;
     }
+
+
+    public String xdlmessage(String params){
+        rabbitTemplate.setConfirmCallback(confirmCallback);
+        rabbitTemplate.setReturnCallback(returnCallback);
+        String yzm = GetUuid.getUuid();
+        CorrelationData correlationData = new CorrelationData(yzm);
+        String param = params + yzm;
+        Message message = MessageBuilder
+                .withBody(param.getBytes(StandardCharsets.UTF_8))
+                .setExpiration("20000")
+                .build();
+        rabbitTemplate.convertAndSend("no_change","no.test", message, correlationData);
+        return param;
+    }
 }

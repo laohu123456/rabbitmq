@@ -1,5 +1,6 @@
 package com.consumer.acceptmessage;
 
+import com.consumer.createchannel.CreateChannel;
 import com.consumer.utils.SendAliEmail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
@@ -87,17 +88,45 @@ public class AcceptMessage {
     public void receiveMessage(Channel channel,
                                 @Headers Map<String,Object> headers,
                                 Message message) throws IOException {
+        Long deliveryTag = 0L;
         try {
-            Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+            deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
             //String payload = new String((byte[]) message.getPayload(),"UTF-8");
             ObjectMapper objectMapper = new ObjectMapper();
             MainInfo mainInfo = objectMapper.readValue((byte[])message.getPayload(), MainInfo.class);
+            System.out.println(mainInfo);
             SendAliEmail.sendMail(mainInfo);
             channel.basicQos(0,1, false);
-            channel.basicAck(deliveryTag,false);
         } catch (MessagingException e) {
             e.printStackTrace();
         }
+        channel.basicAck(deliveryTag,false);
+    }
+
+
+    @RabbitListener(
+            bindings = @QueueBinding(
+                    value = @Queue(
+                            value = "xdl_queue_1", durable = "true"
+                    ),
+                    exchange = @Exchange(
+                            value = "xdl_exchange",
+                            durable = "true",
+                            type = "topic",
+                            ignoreDeclarationExceptions = "true"
+                    ),
+                    key = "xdl.#"
+            )
+    )
+    @RabbitHandler
+    public void xdlqueue(Channel channel,
+                               @Headers Map<String,Object> headers,
+                               Message message) throws IOException {
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+        String str = new String((byte[])message.getPayload());
+        channel.basicQos(0,1,false);
+        System.out.println("xdl: " + str);
+        channel.basicAck(deliveryTag, false);
     }
 
 }

@@ -24,5 +24,10 @@ public class ProviderController {
     }
 
 
+    @RequestMapping(value = "/xdlmessage")
+    public String xdlmessage(@RequestParam(value = "param") String param){
+        return sendMessage.xdlmessage(param);
+    }
+
 
 }

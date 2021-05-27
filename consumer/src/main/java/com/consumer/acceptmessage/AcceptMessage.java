@@ -5,6 +5,7 @@ import com.consumer.utils.SendAliEmail;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rabbitmq.client.Channel;
 import com.server.pojo.MainInfo;
+import com.server.utils.HttpClientUtils;
 import org.springframework.amqp.rabbit.annotation.*;
 import org.springframework.amqp.support.AmqpHeaders;
 import org.springframework.messaging.Message;
@@ -126,6 +127,33 @@ public class AcceptMessage {
         String str = new String((byte[])message.getPayload());
         channel.basicQos(0,1,false);
         System.out.println("xdl: " + str);
+        channel.basicAck(deliveryTag, false);
+    }
+
+
+    @RabbitListener(
+            bindings = @QueueBinding(
+                    value = @Queue(
+                            value = "es-queue", durable = "true"
+                    ),
+                    exchange = @Exchange(
+                            value = "es-exchange",
+                            durable = "true",
+                            type = "topic",
+                            ignoreDeclarationExceptions = "true"
+                    ),
+                    key = "es.#"
+            )
+    )
+    @RabbitHandler
+    public void esqueue(Channel channel,
+                         @Headers Map<String,Object> headers,
+                         Message message) throws IOException {
+        Long deliveryTag = (Long) headers.get(AmqpHeaders.DELIVERY_TAG);
+        String str = new String((byte[])message.getPayload());
+        channel.basicQos(0,1,false);
+        System.out.println("xdl: " + str);
+        HttpClientUtils.post_init("192.168.56.113", 8080, "/springbootelstaicsearch/logMethod/save", "logmethodStr", str);
         channel.basicAck(deliveryTag, false);
     }
 

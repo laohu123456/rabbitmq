@@ -29,5 +29,8 @@ public class ProviderController {
         return sendMessage.xdlmessage(param);
     }
 
-
+    @RequestMapping(value = "/sendEsStr")
+    public String sendEsStr(@RequestParam(value = "str") String str){
+        return sendMessage.sendEsStr(str);
+    }
 }

@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 @Component
 public class SendMessage {
@@ -26,6 +27,7 @@ public class SendMessage {
         public void confirm(CorrelationData correlationData, boolean ack, String s) {
             System.out.println("correlationData   " + correlationData);
             System.out.println("ack   " + ack);
+            // ack == false 表示发送失败，可以进行其他补偿操作
         }
     };
 
@@ -87,5 +89,17 @@ public class SendMessage {
                 .build();
         rabbitTemplate.convertAndSend("no_change","no.test", message, correlationData);
         return param;
+    }
+
+    public String sendEsStr(String str) {
+        rabbitTemplate.setConfirmCallback(confirmCallback);
+        rabbitTemplate.setReturnCallback(returnCallback);
+        String uuid = GetUuid.getUuid();
+        CorrelationData correlationData = new CorrelationData(uuid);
+        Message message = MessageBuilder
+                .withBody(str.getBytes(StandardCharsets.UTF_8))
+                .build();
+        rabbitTemplate.convertAndSend("es-exchange","es.log", message, correlationData);
+        return "OK";
     }
 }
